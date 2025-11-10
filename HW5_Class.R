@@ -147,19 +147,17 @@ setMethod(
     signature = c(x = 'sparse_numeric', y = 'sparse_numeric'),
     definition = function(x, y, ...) {
         if (x@length != y@length) stop('Sparse vectors must be the same length')
-        pos <- sort(unique(c(x@pos, y@pos)))
+        pos <- intersect(x@pos, y@pos)
+        if (length(pos) == 0) {
+            return(new('sparse_numeric', value = numeric(0), pos = integer(0), length = x@length))
+        }
         xVals <- setNames(x@value, x@pos)
         yVals <- setNames(y@value, y@pos)
-        res <- numeric(length(pos))
-        names(res) <- pos
-        inX <- names(res) %in% names(xVals)
-        inY <- names(res) %in% names(yVals)
-        res[inX] <- xVals[names(res)[inX]]
-        res[inY] <- res[inY] * yVals[names(res)[inY]]
+        res <- xVals[as.character(pos)] * yVals[as.character(pos)]
         temp <- res != 0
         new(
             Class = 'sparse_numeric',
-            value = as.numeric(res[temp]),       # remove names
+            value = as.numeric(res[temp]),
             pos = as.integer(names(res)[temp]),
             length = x@length
         )

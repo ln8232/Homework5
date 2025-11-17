@@ -204,9 +204,22 @@ setMethod(
     signature = c(x = 'sparse_numeric', y = 'sparse_numeric'),
     definition = function(x, y, ...) {
         pos <- intersect(x@pos, y@pos)
-        plot(pos, x@value[match(pos, x@pos)], 
-             type = 'p', xlab = 'Position', ylab = 'Value', ...)
-        points(pos, y@value[match(pos, y@pos)])
+        if (length(pos) == 0) {
+            plot(0, 0, type = 'n',
+                 xlab = 'Sparse Vector 1',
+                 ylab = 'Sparse Vector 2',
+                 main = 'Overlapping non-zero elements')
+            return(invisible(NULL))
+        }
+        xvals <- x@value[match(pos, x@pos)]
+        yvals <- y@value[match(pos, y@pos)]
+        plot(
+            xvals, yvals,
+            xlab = 'Sparse Vector 1',
+            ylab = 'Sparse Vector 2',
+            main = 'Overlapping non-zero elements',
+            ...
+        )
     }
 )
 
